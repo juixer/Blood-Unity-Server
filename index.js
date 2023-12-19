@@ -26,13 +26,31 @@ async function run() {
     //////////////////////DB Collections////////////
     const database = client.db("bloodUnity");
     const users = database.collection("users");
+    const donations = database.collection("donations");
 
     ///////////////////////// USER COLLECTION////////////////////////
 
     app.post("/users", async (req, res) => {
       try {
         const userinfo = req.body;
+        const query = { email: req.body.email };
+        const isUserExist = await users.findOne(query);
+        if (isUserExist) {
+          return;
+        }
         const result = await users.insertOne(userinfo);
+        res.send(result);
+      } catch (err) {
+        console.log(err);
+      }
+    });
+
+    ////////////////////////Donation collection////////////////////
+
+    app.post("/donations", async (req, res) => {
+      try {
+        const donation = req.body;
+        const result = await donations.insertOne(donation);
         res.send(result);
       } catch (err) {
         console.log(err);

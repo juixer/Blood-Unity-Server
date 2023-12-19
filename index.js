@@ -3,7 +3,7 @@ require("dotenv").config();
 const app = express();
 const cors = require("cors");
 const port = process.env.PORT || 5000;
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 app.use(express.json());
 app.use(cors());
@@ -30,6 +30,7 @@ async function run() {
 
     ///////////////////////// USER COLLECTION////////////////////////
 
+    // insert user to database
     app.post("/users", async (req, res) => {
       try {
         const userinfo = req.body;
@@ -47,6 +48,30 @@ async function run() {
 
     ////////////////////////Donation collection////////////////////
 
+    // get all donation request from database
+
+    app.get("/donations", async (req, res) => {
+      try {
+        const result = await donations.find().toArray();
+        res.send(result);
+      } catch (err) {
+        console.log(err);
+      }
+    });
+
+    // get single donation details from database
+    app.get('/donation/:id', async (req, res) => {
+      try{
+        const id = req.params.id;
+        const query = {_id : new ObjectId(id)}
+        const result = await donations.findOne(query)
+        res.send(result)
+      }catch (err) {
+        console.log(err);
+      }
+    })
+
+    // insert donation request to database
     app.post("/donations", async (req, res) => {
       try {
         const donation = req.body;

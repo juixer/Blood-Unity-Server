@@ -60,16 +60,31 @@ async function run() {
     });
 
     // get single donation details from database
-    app.get('/donation/:id', async (req, res) => {
-      try{
+    app.get("/donation/:id", async (req, res) => {
+      try {
         const id = req.params.id;
-        const query = {_id : new ObjectId(id)}
-        const result = await donations.findOne(query)
-        res.send(result)
-      }catch (err) {
+        const query = { _id: new ObjectId(id) };
+        const result = await donations.findOne(query);
+        res.send(result);
+      } catch (err) {
         console.log(err);
       }
-    })
+    });
+
+    // get last 3 user by user email
+    app.get("/donations/:email", async (req, res) => {
+      try {
+        const email = req.params.email;
+        const query = { requester_email: email };
+        const option = {
+          sort : {_id : -1}
+        }
+        const result = await donations.find(query, option).limit(3).toArray();
+        res.send(result);
+      } catch (err) {
+        console.log(err);
+      }
+    });
 
     // insert donation request to database
     app.post("/donations", async (req, res) => {
@@ -81,6 +96,19 @@ async function run() {
         console.log(err);
       }
     });
+
+
+    // Delete Donation request from database
+    app.delete('/donation/:id', async (req, res) => {
+      try{
+        const id = req.params.id;
+        const query = { _id: new ObjectId(id) };
+        const result = await donations.deleteOne(query);
+        res.send(result);
+      }catch(err){
+        console.log(err);
+      }
+    })
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });

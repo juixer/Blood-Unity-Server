@@ -77,8 +77,8 @@ async function run() {
         const email = req.params.email;
         const query = { requester_email: email };
         const option = {
-          sort : {_id : -1}
-        }
+          sort: { _id: -1 },
+        };
         const result = await donations.find(query, option).limit(3).toArray();
         res.send(result);
       } catch (err) {
@@ -97,18 +97,43 @@ async function run() {
       }
     });
 
+    // update DOnation
+    app.patch("/updateDonation/:id", async (req, res) => {
+      try {
+        const id = req.params.id;
+        const updateDonation = req.body;
+        const query = { _id: new ObjectId(id) };
+        const updateDoc = {
+          $set: {
+            recipient_name: updateDonation.recipient_name,
+            bloodType: updateDonation.bloodType,
+            district: updateDonation.district,
+            hospital_name: updateDonation.hospital_name,
+            full_address: updateDonation.full_address,
+            donation_time: updateDonation.donation_time,
+            donation_date: updateDonation.donation_date,
+            donation_time_format: updateDonation.donation_time_format,
+            message: updateDonation.message,
+          },
+        };
+        const result = await donations.updateOne(query, updateDoc);
+        res.send(result);
+      } catch (err) {
+        console.log(err);
+      }
+    });
 
     // Delete Donation request from database
-    app.delete('/donation/:id', async (req, res) => {
-      try{
+    app.delete("/donation/:id", async (req, res) => {
+      try {
         const id = req.params.id;
         const query = { _id: new ObjectId(id) };
         const result = await donations.deleteOne(query);
         res.send(result);
-      }catch(err){
+      } catch (err) {
         console.log(err);
       }
-    })
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
